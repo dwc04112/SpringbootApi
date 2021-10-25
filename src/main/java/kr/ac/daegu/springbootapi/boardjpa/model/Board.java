@@ -1,19 +1,18 @@
 package kr.ac.daegu.springbootapi.boardjpa.model;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "board")
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Board {
 
     @Id
@@ -29,9 +28,9 @@ public class Board {
     private String content;
 
     @Column(name = "writeDate")
-    private Date writeDate;
+    private LocalDate writeDate;
     @Column(name = "writeTime")
-    private Time writeTime;
+    private LocalTime writeTime;
     @Column(name = "readCount")
     private Integer readCount;
     @Column(name = "commentCount")
@@ -51,8 +50,8 @@ public class Board {
                  String author,
                  String subject,
                  String content,
-                 Date writeDate,
-                 Time writeTime,
+                 LocalDate writeDate,
+                 LocalTime writeTime,
                  Integer readCount,
                  Integer commentCount,
                  String password,
