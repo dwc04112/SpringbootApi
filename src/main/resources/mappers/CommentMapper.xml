@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.daegu.springbootapi.comment.model.CommentDAO">
+
+    <select id="getCommentsByBoardId" parameterType="int" resultType="kr.ac.daegu.springbootapi.comment.model.CommentDTO">
+        SELECT * FROM COMMENT
+        where id = #{boardId}
+    </select>
+
+    <insert id="postComment" parameterType="kr.ac.daegu.springbootapi.comment.model.CommentDTO">
+        INSERT INTO Comment (id, author, content, writeDate, writeTime) values (#{id}, #{author}, #{content}, #{writeDate}, #{writeTime})
+    </insert>
+
+</mapper>

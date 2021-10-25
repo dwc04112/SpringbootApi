@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.daegu.springbootapi.test.model.TestDAO">
+
+    <select id="getTestList" resultType="kr.ac.daegu.springbootapi.test.model.TestDTO">
+        SELECT * FROM Test
+    </select>
+
+    <insert id="insertTest" parameterType="kr.ac.daegu.springbootapi.test.model.TestDTO">
+        INSERT INTO Test (id, name) values (#{num}, #{name})
+    </insert>
+
+    <!--<select id="selectUsers" parameterType="me.fleuve.springboot03.dto.UserDTO"
+            resultType="me.fleuve.springboot03.dto.UserDTO">&lt;!&ndash; selectUsers()메서드를 호출하면 실행할 SELECT문이며, UserDTO 객체를 파라미터로 받아, UserDTO객체를 반환합니다.&ndash;&gt;
+        SELECT `seq`, `name`, `country`
+        FROM lab03
+        <if test='country != null and country != ""'>&lt;!&ndash; 만약 파라미터에 country가 있다면 SQL문에 WHERE절을 추가합니다. &ndash;&gt;
+            WHERE country = #{country}
+        </if>
+    </select>-->
+
+</mapper>
