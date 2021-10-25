@@ -1,4 +1,11 @@
+
 package kr.ac.daegu.springbootapi.boardjpa.model;
 
-public interface BoardRepository  {
+import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
+
+
+public interface BoardRepository extends CrudRepository<Board, Integer> {
+    List<Board> findAll();
 }
