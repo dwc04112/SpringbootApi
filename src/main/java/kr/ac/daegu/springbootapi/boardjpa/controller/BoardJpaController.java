@@ -21,8 +21,8 @@ public class BoardJpaController {
     public final BoardJpaService boardJpaService;
 
     @GetMapping(value = "/")
-    public ApiResponse<BoardDTO> getBoardList(){
-        Page<Board> list = boardJpaService.getBoardList();
+    public ApiResponse<BoardDTO> getBoardList(@RequestParam int page, @RequestParam int size){
+        Page<Board> list = boardJpaService.getBoardList(page, size);
         return new ApiResponse(true, list);
     }
 

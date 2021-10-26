@@ -22,9 +22,9 @@ public class BoardJpaService {
 
     public final BoardRepository boardRepository;
 
-    public Page<Board> getBoardList() {
+    public Page<Board> getBoardList(int page, int size) {
         // 숙제 2 : jpa queryMethod를 수정하여 isDel이 "N"인 데이터row들만 나오도록 수정
-        PageRequest pageRequest = PageRequest.of(0, 5);
+        PageRequest pageRequest = PageRequest.of(page, size);
         return boardRepository.findBoardsByIsDel("N", pageRequest);
     }
 
