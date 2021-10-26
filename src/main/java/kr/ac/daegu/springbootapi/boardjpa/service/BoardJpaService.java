@@ -6,6 +6,8 @@ import kr.ac.daegu.springbootapi.boardjpa.model.BoardRepository;
 import kr.ac.daegu.springbootapi.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,14 +22,21 @@ public class BoardJpaService {
 
     public final BoardRepository boardRepository;
 
-    public List<Board> getBoardList() {
+    public Page<Board> getBoardList() {
         // 숙제 2 : jpa queryMethod를 수정하여 isDel이 "N"인 데이터row들만 나오도록 수정
-        String isDelN = "N";
-        return boardRepository.findByIsDelEquals(isDelN);
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        return boardRepository.findBoardsByIsDel("N", pageRequest);
     }
 
     public Board getBoardById(Integer id) {
-        return boardRepository.findBoardById(id);
+        Optional<Board> board = boardRepository.findBoardById(id);
+        // 아래 코드를 한줄로 줄이면...
+//        if(board.isPresent()){
+//            return board.get();
+//        } else {
+//            return null;
+//        }
+        return board.orElse(null);
     }
 
     public Board postBoard(BoardDTO boardDTO) {
@@ -45,6 +54,8 @@ public class BoardJpaService {
                 .writeDate(LocalDate.now())
                 .writeTime(LocalTime.now())
                 .build();
+
+
         return boardRepository.save(postData);
     }
 
@@ -63,20 +74,18 @@ public class BoardJpaService {
         return boardData.orElseGet(boardData::get);
     }
 
-    public ApiResponse<BoardDTO> updateIsDelBoard(int id, BoardDTO boardDTO) {
-        // 비밀번호 일치 확인
-        Board oriPass = boardRepository.getBoardById(id);
-        boolean isPwdMatch = oriPass.getPassword().equals(boardDTO.getPassword());
-        if (!isPwdMatch){
-            return new ApiResponse<>(false, "board password is not match, please check requested board password");
-        }
-        // 비밀번호 일치시 IsDel : Y 로 변경
+    public ApiResponse<BoardDTO> updateIsDelBoardById(int id, String boardPassword) {
+        // JDK 1.8 Optional에 관해 찾아볼것.
         Optional<Board> boardData = boardRepository.findBoardById(id);
-        boardData.ifPresent(selectedBoard ->{
-            selectedBoard.setIsDel("Y");
-            boardRepository.save(selectedBoard);
-        });
-
-        return new ApiResponse<>(true, "board id " + id + " is successfully deleted");
+        // 위 boardData가 null 이면 RuntimeException 발생시키고 메소드 종료.
+        Board data = boardData.orElseThrow(() -> new RuntimeException("no data"));
+        // password 비교
+        if(data.getPassword().equals(boardPassword)){
+            data.setIsDel("Y");
+            boardRepository.save(data); // JPA는 INSERT나 UPDATE 같이 save()를 호출한다.
+            return new ApiResponse(true, "board id " + id + " is successfully deleted");
+        } else {
+            return new ApiResponse(false, "failed to delete board id " + id);
+        }
     }
 }
