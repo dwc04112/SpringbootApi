@@ -3,7 +3,7 @@ package kr.ac.daegu.springbootapi.boardjpa.service;
 import kr.ac.daegu.springbootapi.board.model.BoardDTO;
 import kr.ac.daegu.springbootapi.boardjpa.model.Board;
 import kr.ac.daegu.springbootapi.boardjpa.model.BoardRepository;
-import kr.ac.daegu.springbootapi.comment.model.CommentDAO;
+import kr.ac.daegu.springbootapi.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,8 @@ public class BoardJpaService {
 
     public List<Board> getBoardList() {
         // 숙제 2 : jpa queryMethod를 수정하여 isDel이 "N"인 데이터row들만 나오도록 수정
-        return boardRepository.findAll();
+        String isDelN = "N";
+        return boardRepository.findByIsDelEquals(isDelN);
     }
 
     public Board getBoardById(Integer id) {
@@ -60,5 +61,22 @@ public class BoardJpaService {
         });
 
         return boardData.orElseGet(boardData::get);
+    }
+
+    public ApiResponse<BoardDTO> updateIsDelBoard(int id, BoardDTO boardDTO) {
+        // 비밀번호 일치 확인
+        Board oriPass = boardRepository.getBoardById(id);
+        boolean isPwdMatch = oriPass.getPassword().equals(boardDTO.getPassword());
+        if (!isPwdMatch){
+            return new ApiResponse<>(false, "board password is not match, please check requested board password");
+        }
+        // 비밀번호 일치시 IsDel : Y 로 변경
+        Optional<Board> boardData = boardRepository.findBoardById(id);
+        boardData.ifPresent(selectedBoard ->{
+            selectedBoard.setIsDel("Y");
+            boardRepository.save(selectedBoard);
+        });
+
+        return new ApiResponse<>(true, "board id " + id + " is successfully deleted");
     }
 }
