@@ -41,7 +41,7 @@ public class CommentJpaService {
         Board board = b.orElseThrow(() ->
                 new NullPointerException("board id value" + commentDTO.getId() + "is null")
         );
-        board.setReadCount(board.getReadCount() + 1);
+        board.setReadCount(board.getCommentCount() + 1);
         boardRepository.save(board);
         return commentDTO;
     }
