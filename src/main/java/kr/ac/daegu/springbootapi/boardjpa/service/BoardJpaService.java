@@ -94,6 +94,7 @@ public class BoardJpaService {
     @Transactional
     public ApiResponse<BoardDTO> postReply(BoardDTO dto) {
         /* JPQL TEST 겸 원글 불러오기 */
+        log.debug("log :::: test :: "+dto.getId());
         Board b = boardRepository.selectBoard(dto.getId());
         if(b == null){
             return new ApiResponse(false, "board id " + dto.getReplyRootId() + " is null");

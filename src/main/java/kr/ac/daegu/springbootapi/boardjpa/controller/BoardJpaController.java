@@ -33,7 +33,7 @@ public class BoardJpaController {
     }
 
     @PostMapping(value = "/")
-    public ApiResponse<BoardDTO> postBoard(BoardDTO boardDTO){
+    public ApiResponse<BoardDTO> postBoard(@RequestBody BoardDTO boardDTO){
         Board data = boardJpaService.postBoard(boardDTO);
         return new ApiResponse(true, data);
     }
