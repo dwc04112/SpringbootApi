@@ -40,6 +40,8 @@ public class BoardJpaService {
     }
 
     public Board postBoard(BoardDTO boardDTO) {
+        // 답글 작성할 수 있을려면 java단에서 id값을 정한 뒤 save해야 하겠다.
+        // jpa로 max(id) + 1 하여 만든 id, replyRootId 함께 set하여 save돌려야 할듯.
         Board postData = Board.builder()
                 .author(boardDTO.getAuthor())
                 .subject(boardDTO.getSubject())
@@ -100,10 +102,13 @@ public class BoardJpaService {
 
         /* depth와 orderNum을 정하는 로직 START */
         int replyRootId = dto.getReplyRootId();
-        int depth = b.getDepth();
-        int orderNum = b.getOrderNum();
+        int depth = dto.getDepth();
+        int orderNum = dto.getOrderNum();
 
         Integer minOrderNum = boardRepository.getMinOrderNum(replyRootId, depth, orderNum);
+        if(minOrderNum == null) {
+            minOrderNum = 0;
+        }
         log.debug("minOrderNum==" + minOrderNum);
         // minOrderNum이 0인 경우 : root글에 달린 답글들 사이에 추가되는 답글인지? 바로추가답글 : 사이답글임.
         if(minOrderNum == 0) {

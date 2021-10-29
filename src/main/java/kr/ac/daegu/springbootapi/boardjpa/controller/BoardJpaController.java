@@ -1,4 +1,3 @@
-
 package kr.ac.daegu.springbootapi.boardjpa.controller;
 
 import kr.ac.daegu.springbootapi.board.model.BoardDTO;
