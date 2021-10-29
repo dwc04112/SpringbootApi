@@ -92,7 +92,7 @@ public class BoardJpaService {
     @Transactional
     public ApiResponse<BoardDTO> postReply(BoardDTO dto) {
         /* JPQL TEST 겸 원글 불러오기 */
-        Board b = boardRepository.selectBoard(dto.getReplyRootId());
+        Board b = boardRepository.selectBoard(dto.getId());
         if(b == null){
             return new ApiResponse(false, "board id " + dto.getReplyRootId() + " is null");
         }
@@ -100,8 +100,8 @@ public class BoardJpaService {
 
         /* depth와 orderNum을 정하는 로직 START */
         int replyRootId = dto.getReplyRootId();
-        int depth = dto.getDepth();
-        int orderNum = dto.getOrderNum();
+        int depth = b.getDepth();
+        int orderNum = b.getOrderNum();
 
         Integer minOrderNum = boardRepository.getMinOrderNum(replyRootId, depth, orderNum);
         log.debug("minOrderNum==" + minOrderNum);
