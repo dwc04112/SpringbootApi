@@ -25,7 +25,11 @@ public class BoardJpaService {
     public Page<Board> getBoardList(int page, int size) {
         // 숙제 2 : jpa queryMethod를 수정하여 isDel이 "N"인 데이터row들만 나오도록 수정
         PageRequest pageRequest = PageRequest.of(page, size);
-        return boardRepository.findBoardsByIsDel("N", pageRequest);
+        // 페이지네이션 + 정렬조건 + 다른 개발자 부여 조건 하여 List하는 여러 방법들..
+        // https://dar0m.tistory.com/61
+//        return boardRepository.findBoardsByIsDel("N", pageRequest);
+        // 그외 쿼리메소드로 작성하여 바로 적용.
+        return boardRepository.findBoardsByIsDelOrderByReplyRootIdDescOrderNumAsc("N", pageRequest);
     }
 
     public Board getBoardById(Integer id) {
@@ -40,9 +44,12 @@ public class BoardJpaService {
     }
 
     public Board postBoard(BoardDTO boardDTO) {
+        log.debug("author="+boardDTO.getAuthor());
         // 답글 작성할 수 있을려면 java단에서 id값을 정한 뒤 save해야 하겠다.
         // jpa로 max(id) + 1 하여 만든 id, replyRootId 함께 set하여 save돌려야 할듯.
+        int newBoardIdValue = this.getNewBoardIdValue(boardRepository);
         Board postData = Board.builder()
+                .id(newBoardIdValue)
                 .author(boardDTO.getAuthor())
                 .subject(boardDTO.getSubject())
                 .content(boardDTO.getContent())
@@ -52,13 +59,27 @@ public class BoardJpaService {
                 .orderNum(0)
                 .isDel("N")
                 .readCount(0)
-                .replyRootId(0)
+                .replyRootId(newBoardIdValue)
                 .writeDate(LocalDate.now())
                 .writeTime(LocalTime.now())
                 .build();
 
 
         return boardRepository.save(postData);
+    }
+
+    private int getNewBoardIdValue(BoardRepository boardRepository) {
+        int result;
+        Board boardOfMaxId = boardRepository.findTopByOrderByIdDesc();
+        if(boardOfMaxId == null) {
+            result = 1;
+            log.debug("no board data, maxId is 1");
+        } else {
+            result = boardOfMaxId.getId() + 1;
+            log.debug("maxIdFromBoard="+boardOfMaxId.getId());
+        }
+        log.debug("newBoardIdValue="+result);
+        return result;
     }
 
     public Board putBoard(int id, BoardDTO boardDTO) {
@@ -94,7 +115,6 @@ public class BoardJpaService {
     @Transactional
     public ApiResponse<BoardDTO> postReply(BoardDTO dto) {
         /* JPQL TEST 겸 원글 불러오기 */
-        log.debug("log :::: test :: "+dto.getId());
         Board b = boardRepository.selectBoard(dto.getId());
         if(b == null){
             return new ApiResponse(false, "board id " + dto.getReplyRootId() + " is null");

@@ -34,6 +34,7 @@ public class BoardJpaController {
 
     @PostMapping(value = "/")
     public ApiResponse<BoardDTO> postBoard(@RequestBody BoardDTO boardDTO){
+        log.debug("author="+boardDTO.getAuthor());
         Board data = boardJpaService.postBoard(boardDTO);
         return new ApiResponse(true, data);
     }
